@@ -1,6 +1,6 @@
-# RELIANOID Community Edition – AWS Terraform Deployment
+# RELIANOID Enterprise Edition – AWS Terraform Deployment
 
-This Terraform configuration deploys the **RELIANOID Community Edition** virtual machine from the AWS Marketplace using the official Marketplace AMI ID. It automatically provisions:
+This Terraform configuration deploys the **RELIANOID Enterprise Edition** virtual machine from the AWS Marketplace using the official Marketplace AMI ID. It automatically provisions:
 
 - VPC and Public Subnet  
 - Internet Gateway and Route Table  
@@ -11,17 +11,40 @@ This Terraform configuration deploys the **RELIANOID Community Edition** virtual
 
 ---
 
+## Quick Start
+## Clone this repository
+- git clone https://git.relianoid.com/Relianoid/terraform-AWS-relianoid-Enterprise
+- cd terraform-AWS-relianoid-Enterprise
+
+## Generate an SSH key (if not already)
+- ssh-keygen -t rsa -b 4096 -f id_rsa
+
+## Copy your public key to the project folder
+- cp ~/.ssh/id_rsa.pub ./id_rsa.pub
+
+## Edit terraform.tfvars
+- ami_id = "your-ami-id"
+- ssh_public_key  = file("id_rsa.pub")
+
+## Deploy
+- terraform init
+- terraform plan
+- terraform apply
+
+## Access your VM
+- ssh -i id_rsa azureuser@public-ip
+---
+
 ## rerequisites
 
 - **Terraform CLI** installed (**v1.4+ recommended**)  
 - **AWS account** with permission to create EC2, networking, and IAM resources  
-- **Valid SSH key pair** (`id_rsa`, `id_rsa.pub`) — generate using:  
+- **Valid SSH key pair** (id_rsa, id_rsa.pub) — generate using:  
   ```bash
   ssh-keygen -t rsa -b 4096 -f id_rsa
   ```
-- Subscribed to the RELIANOID Community Edition AWS Marketplace listing (must be done before deployment)
+- Subscribed to the RELIANOID Enterprise Edition AWS Marketplace listing (must be done before deployment)
 
----
 
 ## Files Overview
 
@@ -33,7 +56,6 @@ This Terraform configuration deploys the **RELIANOID Community Edition** virtual
 | outputs.tf        | Displays useful AWS resource details after deployment |
 | README.md         | This documentation |
 
----
 
 ##  Marketplace Image Info
 
@@ -73,7 +95,7 @@ terraform apply
 
 ---
 
-## 🔌 Access the VM
+##  Access the VM
 
 Once deployed, you can SSH into the VM:
 
@@ -133,7 +155,7 @@ ssh -i id_rsa admin@54.210.123.45
 
 ---
 
-## 🌐 Web GUI Access
+##  Web GUI Access
 
 Once deployed, the RELIANOID web interface will be available at:
 
@@ -143,7 +165,7 @@ https://<elastic-ip>:444
 
 ---
 
-## 🗑 Destroy Resources
+##  Destroy Resources
 
 To delete all created resources:
 
