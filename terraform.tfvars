@@ -1,0 +1,9 @@
+ami_id               = "ami-0aaa411248ed06acd" # Replace with Marketplace AMI ID
+aws_region           = "us-east-1"
+aws_availability_zone = "us-east-1a"
+vpc_name             = "relianoid-vpc"
+subnet_name          = "relianoid-subnet"
+vm_name              = "relianoid-vm"
+instance_type        = "t3.medium"
+key_name             = "relianoid-key"
+public_ssh_key_path  = "id_rsa.pub"
