@@ -74,18 +74,16 @@ module "relianoid-enterprise" {
 ## `outputs.tf`
 ``` hcl
 output "instance_id" {
-  description = "The AWS EC2 instance ID"
-  value       = module.relianoid_aws.instance_id
+description = "The ID of the EC2 instance"
+value = module.relianoid-enterprise.instance_id
 }
-
 output "instance_public_ip" {
-  description = "Public IP address of the instance"
-  value       = module.relianoid_aws.instance_public_ip
+description = "The public IP of the EC2 instance"
+value = module.relianoid-enterprise.instance_public_ip
 }
-
 output "instance_private_ip" {
-  description = "Private IP within the VPC"
-  value       = module.relianoid_aws.instance_private_ip
+description = "The private IP of the EC2 instance"
+value = module.relianoid-enterprise.instance_private_ip
 }
 ```
 
