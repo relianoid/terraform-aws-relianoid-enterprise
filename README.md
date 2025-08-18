@@ -71,6 +71,24 @@ module "relianoid-enterprise" {
 }
 ```
 
+## `outputs.tf`
+``` hcl
+output "instance_id" {
+  description = "The AWS EC2 instance ID"
+  value       = module.relianoid_aws.instance_id
+}
+
+output "instance_public_ip" {
+  description = "Public IP address of the instance"
+  value       = module.relianoid_aws.instance_public_ip
+}
+
+output "instance_private_ip" {
+  description = "Private IP within the VPC"
+  value       = module.relianoid_aws.instance_private_ip
+}
+```
+
 ### Notes:
 
 -   Users must generate an SSH key pair in the current folder before
@@ -122,10 +140,6 @@ Then open the Web GUI in your browser:
 | instance_id        | The AWS EC2 instance ID |
 | instance_public_ip | Public IP address of the instance |
 | instance_private_ip| Private IP within the VPC |
-| availability_zone  | AWS Availability Zone where the instance is deployed |
-| ami_id             | AMI used to launch the instance |
-| ssh_command        | Ready-to-use SSH connection command |
-
 ------------------------------------------------------------------------
 
 ## Destroy Resources
