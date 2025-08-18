@@ -1,113 +1,119 @@
-# RELIANOID Enterprise Edition – AWS Terraform Deployment
+# RELIANOID Enterprise Edition - AWS Terraform Module
 
-This Terraform configuration deploys the **RELIANOID Enterprise Edition** virtual machine from the AWS Marketplace using the official Marketplace AMI ID. It automatically provisions:
+This guide explains how to deploy the RELIANOID Enterprise Edition
+virtual machine on AWS using the official Terraform module from the
+Terraform Registry.
 
-- VPC and Public Subnet  
-- Internet Gateway and Route Table  
-- Security Group with port rules (SSH 22, Web GUI 444)  
-- Elastic IP for public access  
-- An EC2 Instance based on the published RELIANOID image  
-- SSH Key access for secure login (imported from your local public key)  
+The module provisions automatically:
 
----
+-   VPC with Internet Gateway
+-   Public Subnet
+-   Security Group (allowing SSH 22, Web GUI 444)
+-   EC2 Instance using the RELIANOID Community Edition AMI
+-   Key Pair for SSH access
 
-## Quick Start
-## Clone this repository
-- git clone https://git.relianoid.com/Relianoid/terraform-AWS-relianoid-Enterprise
-- cd terraform-AWS-relianoid-Enterprise
+## Prerequisites
 
-## Generate an SSH key (if not already)
-- ssh-keygen -t rsa -b 4096 -f id_rsa
+### Install Terraform
 
-## Copy your public key to the project folder
-- cp ~/.ssh/id_rsa.pub ./id_rsa.pub
+Download Terraform and install it for your OS.
 
-## Edit terraform.tfvars
-- ami_id = "your-ami-id"
-- ssh_public_key  = file("id_rsa.pub")
-
-## Deploy
-- terraform init
-- terraform plan
-- terraform apply
-
-## Access your VM
-- ssh -i id_rsa azureuser@public-ip
----
-
-## rerequisites
-
-- **Terraform CLI** installed (**v1.4+ recommended**)  
-- **AWS account** with permission to create EC2, networking, and IAM resources  
-- **Valid SSH key pair** (id_rsa, id_rsa.pub) — generate using:  
-  ```bash
-  ssh-keygen -t rsa -b 4096 -f id_rsa
-  ```
-- Subscribed to the RELIANOID Enterprise Edition AWS Marketplace listing (must be done before deployment)
-
-
-## Files Overview
-
-| File              | Description |
-|-------------------|-------------|
-| main.tf           | Core infrastructure resources |
-| variables.tf      | Input variable definitions |
-| terraform.tfvars  | User-defined values (edit with your own settings) |
-| outputs.tf        | Displays useful AWS resource details after deployment |
-| README.md         | This documentation |
-
-
-##  Marketplace Image Info
-
-Replace the placeholder with the actual AMI ID for your AWS region:
-
-```hcl
-ami_id = "ami-xxxxxxxxxxxxxxxxx"
+``` bash
+terraform -version
 ```
-⚠ **Note**: AMI IDs are region-specific — you must find the correct one for your chosen AWS region.
 
----
+### Install AWS CLI
 
-##  SSH Key Setup
+Download AWS CLI and configure it with your credentials.
 
-Generate an SSH key pair (skip if you already have one):
+``` bash
+aws configure
+```
 
-```bash
+### SSH Key Pair
+
+You'll need an SSH key to access the VM. If you don't already have one:
+
+> **Note:** Users must generate an SSH key pair in the current folder
+> before running Terraform:
+
+``` bash
 ssh-keygen -t rsa -b 4096 -f id_rsa
 ```
-Copy the generated **id_rsa.pub** into this project folder.
 
-Keep the private key (**id_rsa**) safe — you’ll need it for SSH access.
+This creates `id_rsa` (private key) and `id_rsa.pub` (public key). Keep
+the keys in the same directory where Terraform files are stored.
 
-Terraform will automatically import `id_rsa.pub` into AWS as a key pair.
+------------------------------------------------------------------------
 
----
+## Step 1: Find the Terraform Module
 
-##  Deployment
+-   Go to [Terraform Registry](https://registry.terraform.io/).
+-   Search for `relianoid-Enterprise`.
+-   Select the official module `relianoid/relianoid-Enterprise`.
 
-Initialize and apply Terraform:
+## Step 2: Create a Project Folder
 
-```bash
+``` bash
+mkdir relianoid-aws
+cd relianoid-aws
+```
+
+## Step 3: Create `main.tf`
+
+``` hcl
+module "relianoid-enterprise" {
+  source  = "relianoid/relianoid-enterprise/aws"
+  version = "1.0.1"
+
+  ami_id              = "ami-ami-0169776ce0edf5fc5"  # default US East Marketplace AMI
+  public_ssh_key_path  = "${path.module}/id_rsa.pub"
+}
+```
+
+### Notes:
+
+-   Users must generate an SSH key pair in the current folder before
+    running Terraform:
+
+``` bash
+ssh-keygen -t rsa -b 4096 -f ./id_rsa -N ""
+```
+
+-   The module internally provisions all required AWS resources,
+    including VPC, Subnet, Security Group, EC2 instance, and key pair.
+-   Users can override `ami_id` if they wish to use a different AMI.
+
+------------------------------------------------------------------------
+
+## Step 4: Initialize & Deploy
+
+Run the following:
+
+``` bash
 terraform init
 terraform plan
 terraform apply
 ```
 
----
+Confirm with `yes` when prompted.
 
-##  Access the VM
+------------------------------------------------------------------------
 
-Once deployed, you can SSH into the VM:
+## Step 5: Access the RELIANOID VM
 
-```bash
-ssh -i id_rsa ec2-user@<elastic-ip>
+After deployment, Terraform outputs the public IP address. Connect using
+SSH:
+
+``` bash
+ssh -i id_rsa admin@(instance_public_ip)
 ```
 
----
+Then open the Web GUI in your browser:
 
-##  Terraform Outputs
+    https://<public-ip>:444
 
-When you run `terraform apply`, Terraform will display outputs defined in **outputs.tf**.
+------------------------------------------------------------------------
 
 ### Available Outputs
 
@@ -120,59 +126,20 @@ When you run `terraform apply`, Terraform will display outputs defined in **outp
 | ami_id             | AMI used to launch the instance |
 | ssh_command        | Ready-to-use SSH connection command |
 
-### How to View Outputs
+------------------------------------------------------------------------
 
-To view all outputs:
+## Destroy Resources
 
-```bash
-terraform output
-```
+To delete everything created:
 
-To view a specific output (example: public IP only):
-
-```bash
-terraform output instance_public_ip
-```
-
-### Example Output
-
-```plaintext
-instance_id = "i-0123456789abcdef0"
-instance_public_ip = "54.210.123.45"
-instance_private_ip = "172.31.16.20"
-availability_zone = "us-east-1a"
-ami_id = "ami-0abcdef1234567890"
-ssh_command = "ssh -i id_rsa admin@54.210.123.45"
-```
-
-Connect via SSH:
-
-```bash
-ssh -i id_rsa admin@54.210.123.45
-```
-
-💡 The username may vary depending on the RELIANOID AMI configuration.
-
----
-
-##  Web GUI Access
-
-Once deployed, the RELIANOID web interface will be available at:
-
-```
-https://<elastic-ip>:444
-```
-
----
-
-##  Destroy Resources
-
-To delete all created resources:
-
-```bash
+``` bash
 terraform destroy
 ```
 
-⚠ **Important**:  
-- Make sure you have the correct `ami_id` in **terraform.tfvars**  
-- Ensure you are subscribed to the AWS Marketplace listing before deploying
+------------------------------------------------------------------------
+
+## ⚠️ Important Notes:
+
+-   The AMI ID used is for **us-east-1**. If you deploy in another
+    region, replace it with the correct Marketplace AMI.
+-   Always secure your private key (`id_rsa`).
