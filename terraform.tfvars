@@ -1,4 +1,4 @@
-ami_id = "ami-0169776ce0edf5fc5"  # This AMI is for us-east; replace it with your region's Marketplace AMI ID.
+ami_id = "ami-084e20907cf52d96a"# This AMI is for us-east; replace it with your region's Marketplace AMI ID.
 aws_region           = "us-east-1"
 aws_availability_zone = "us-east-1a"
 vpc_name             = "relianoid-vpc"
